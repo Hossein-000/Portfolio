@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hossein Fotoohi | 3D & AI Artist</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Oswald for bold display, Inter for body -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Oswald:wght@500;700;900&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* Base Configuration */
+        body {
+            background-color: #18181b; /* Tailwind zinc-900 */
+            color: #f4f4f5; /* Tailwind zinc-100 */
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            cursor: none; /* Hide default cursor */
+        }
+
+        .font-display {
+            font-family: 'Oswald', sans-serif;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #18181b; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3f3f46; 
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #facc15; /* Yellow-400 */
+        }
+
+        /* Custom Cursor */
+        #custom-cursor {
+            position: fixed;
+            width: 12px;
+            height: 12px;
+            background-color: #facc15;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 99999;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s ease, height 0.3s ease, background-color 0.3s ease;
+            mix-blend-mode: difference;
+        }
+        .cursor-hover {
+            width: 60px !important;
+            height: 60px !important;
+            background-color: rgba(250, 204, 21, 0.2) !important;
+            border: 2px solid #facc15;
+            mix-blend-mode: normal !important;
+        }
+        .cursor-hidden {
+            opacity: 0;
+        }
+
+        /* Text Stroke Effect for Hero */
+        .text-stroke {
+            color: transparent;
+            -webkit-text-stroke: 2px #facc15;
+        }
+        .text-stroke:hover {
+            color: #facc15;
+            transition: color 0.3s ease;
+        }
+
+        /* Infinite Marquee */
+        .marquee-wrapper {
+            overflow: hidden;
+            white-space: nowrap;
+            display: flex;
+        }
+        .marquee-content {
+            display: flex;
+            animation: marquee 25s linear infinite;
+        }
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); } 
+        }
+
+        /* Modern Slideshow Reveal for Desktop */
+        .preview-container {
+            position: sticky;
+            top: 15vh;
+            height: 70vh;
+            width: 100%;
+            overflow: hidden;
+            border-radius: 1rem;
+            display: none; 
+        }
+        @media (min-width: 768px) {
+            .preview-container { display: block; }
+        }
+        
+        .preview-wrapper {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transform: scale(1.1) translateY(5%);
+            clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0 100%);
+            transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), clip-path 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s ease;
+            z-index: 1;
+            overflow: hidden;
+            background: rgba(24, 24, 27, 0.6);
+        }
+        .preview-wrapper.active {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+            z-index: 2;
+        }
+
+        /* Project List Items */
+        .project-item {
+            transition: padding-left 0.4s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s, backdrop-filter 0.3s;
+        }
+        .project-item:hover {
+            padding-left: 2rem;
+            background-color: rgba(39, 39, 42, 0.4); 
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+        
+        /* Modal Transition */
+        #project-modal {
+            transition: transform 0.8s cubic-bezier(0.77, 0, 0.175, 1);
+        }
+        .modal-open {
+            transform: translateY(0%);
+        }
+        .modal-closed {
+            transform: translateY(100%);
+        }
+
+        /* Utilities */
+        .reveal-up {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal-up.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Hover Letter & Modern Magnify Outline Effect */
+        .hover-letter {
+            display: inline-block;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.2s ease, -webkit-text-stroke 0.2s ease;
+            position: relative;
+            -webkit-text-stroke: 1px transparent;
+        }
+
+        /* Glassmorphism Utilities */
+        .glass {
+            background: rgba(24, 24, 27, 0.4); 
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        }
+        .glass-panel {
+            background: rgba(250, 204, 21, 0.85); 
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* Ambient Glows for Glassmorphism contrast */
+        .ambient-glow {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.15;
+            z-index: -1;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="antialiased relative">
+
+    <!-- Ambient Glows -->
+    <div class="ambient-glow bg-yellow-400 w-[40vw] h-[40vw] top-[-10%] left-[-10%]"></div>
+    <div class="ambient-glow bg-emerald-500 w-[50vw] h-[50vw] bottom-[-20%] right-[-10%]"></div>
+
+    <!-- Custom Cursor -->
+    <div id="custom-cursor"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-6 left-1/2 -translate-x-1/2 w-[92%] max-w-7xl z-50 py-4 px-6 md:px-8 flex justify-between items-center glass rounded-2xl pointer-events-auto transition-transform duration-300">
+        <div class="font-display font-bold text-2xl tracking-widest text-white">
+            HOSSEIN<span class="text-yellow-400">FOTOOHI</span>
+        </div>
+        <div class="flex gap-4 md:gap-8 font-mono text-xs md:text-sm tracking-widest">
+            <a href="#projects" class="magnetic text-white hover:text-yellow-400 transition-colors py-2 px-2 md:px-4">WORKS</a>
+            <a href="#contact" class="magnetic text-white hover:text-yellow-400 transition-colors py-2 px-2 md:px-4">CONTACT</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="relative w-full h-screen flex flex-col justify-center items-center overflow-hidden">
+        <!-- Interactive Canvas Background -->
+        <canvas id="hero-canvas" class="absolute inset-0 z-0 opacity-40"></canvas>
+
+        <div class="relative z-10 w-full px-4 md:px-12 flex flex-col items-start pointer-events-none">
+            <p class="font-mono text-yellow-400 tracking-[0.3em] mb-4 ml-2 reveal-up">PORTFOLIO // 2026</p>
+            <h1 class="font-display font-black text-[12vw] leading-[0.85] m-0 p-0 reveal-up" style="transition-delay: 100ms;">
+                <span class="block">CREATIVE</span>
+                <span class="block text-stroke cursor-none pointer-events-auto">3D & AI</span>
+                <span class="block text-zinc-500">DIRECTOR</span>
+            </h1>
+        </div>
+        
+        <!-- Scroll indicator -->
+        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-50 reveal-up" style="transition-delay: 400ms;">
+            <span class="font-mono text-xs tracking-widest rotate-90 mb-4 text-yellow-400">SCROLL</span>
+            <div class="w-[1px] h-12 bg-gradient-to-b from-yellow-400 to-transparent"></div>
+        </div>
+    </header>
+
+    <!-- Infinite Marquee Section -->
+    <section class="w-full bg-yellow-400 text-zinc-900 py-6 border-y-2 border-yellow-500">
+        <div class="marquee-wrapper">
+            <div class="marquee-content font-display font-bold text-4xl tracking-wider">
+                <span class="mx-8">BLENDER</span><span class="mx-8">•</span>
+                <span class="mx-8">PREMIERE</span><span class="mx-8">•</span>
+                <span class="mx-8">AFTER EFFECTS</span><span class="mx-8">•</span>
+                <span class="mx-8">RUNWAY</span><span class="mx-8">•</span>
+                <span class="mx-8">VEO</span><span class="mx-8">•</span>
+                <span class="mx-8">OMNI</span><span class="mx-8">•</span>
+                
+                <span class="mx-8">BLENDER</span><span class="mx-8">•</span>
+                <span class="mx-8">PREMIERE</span><span class="mx-8">•</span>
+                <span class="mx-8">AFTER EFFECTS</span><span class="mx-8">•</span>
+                <span class="mx-8">RUNWAY</span><span class="mx-8">•</span>
+                <span class="mx-8">VEO</span><span class="mx-8">•</span>
+                <span class="mx-8">OMNI</span><span class="mx-8">•</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interactive Projects List -->
+    <section id="projects" class="py-32 px-4 md:px-12 max-w-screen-2xl mx-auto">
+        <div class="mb-16 reveal-up">
+            <h2 class="font-display font-bold text-5xl md:text-7xl uppercase text-zinc-100">Selected <span class="text-yellow-400">Works</span></h2>
+            <div class="h-1 w-24 bg-yellow-400 mt-6"></div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 relative">
+            <div class="flex flex-col border-t border-zinc-800 w-full" id="project-list">
+                <!-- Items injected by JS -->
+            </div>
+            
+            <!-- Desktop Fixed Slideshow Preview -->
+            <div class="relative w-full h-full hidden md:block">
+                <div class="preview-container glass border-yellow-500/30 shadow-2xl shadow-yellow-500/10" id="preview-container">
+                    <!-- Preview Wrappers injected by JS -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Brutalist Footer / Contact -->
+    <footer id="contact" class="bg-zinc-950/80 backdrop-blur-lg pt-32 pb-16 px-4 md:px-12 border-t border-zinc-800 relative overflow-hidden">
+        <div class="max-w-screen-2xl mx-auto relative z-10 flex flex-col items-center text-center reveal-up">
+            <h2 class="font-display font-black text-[10vw] leading-none text-zinc-800 hover:text-zinc-700 transition-colors mb-8">
+                LET'S <span class="text-yellow-400">TALK</span>
+            </h2>
+            
+            <p class="text-zinc-400 max-w-xl mx-auto text-lg mb-12">
+                Currently available for freelance projects, 3D conceptualization, and AI-driven motion design.
+            </p>
+
+            <button onclick="copyEmail()" class="magnetic group relative inline-flex items-center justify-center px-12 py-5 font-bold text-zinc-900 bg-yellow-400 uppercase tracking-widest overflow-hidden transition-all shadow-[0_0_20px_rgba(250,204,21,0.3)]">
+                <span id="email-btn-text" class="relative z-10">HOSSEIN.FTH11@GMAIL.COM</span>
+                <div class="absolute inset-0 w-full h-full bg-white scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300 ease-out z-0"></div>
+            </button>
+        </div>
+        
+        <div class="absolute -bottom-10 left-0 w-full overflow-hidden whitespace-nowrap opacity-5 pointer-events-none select-none">
+            <h1 class="font-display font-black text-[20vw] leading-none text-white m-0 p-0">FOTOOHI</h1>
+        </div>
+    </footer>
+
+    <!-- Fullscreen Project Modal (Glassmorphism Upgrade) -->
+    <div id="project-modal" class="fixed inset-0 z-[100] modal-closed flex flex-col md:flex-row overflow-hidden bg-zinc-950/70 backdrop-blur-xl">
+        
+        <!-- Left: Huge Typography & Info -->
+        <div class="w-full md:w-1/3 p-8 md:p-16 flex flex-col justify-between relative z-20 glass-panel shadow-2xl overflow-y-auto">
+            <div>
+                <button id="close-modal" class="magnetic w-12 h-12 rounded-full border-2 border-zinc-900 flex items-center justify-center text-zinc-900 hover:bg-zinc-900 hover:text-yellow-400 transition-colors mb-12">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+                
+                <p id="modal-category" class="font-mono text-sm font-bold tracking-widest text-zinc-700 mb-4 uppercase"></p>
+                <h2 id="modal-title" class="font-display font-black text-5xl md:text-7xl text-zinc-900 leading-tight mb-8 uppercase">Project Title</h2>
+                
+                <p id="modal-desc" class="text-zinc-800 text-lg leading-relaxed mb-8">
+                    Description goes here.
+                </p>
+
+                <div class="flex flex-wrap gap-2" id="modal-tags">
+                    <!-- Tags injected via JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Massive Media Area with Dynamic Blurred Background -->
+        <div class="w-full md:w-2/3 h-[50vh] md:h-full relative flex items-center justify-center p-8 overflow-hidden bg-zinc-950">
+            
+            <!-- Dynamic Blurred Background Layers -->
+            <img id="modal-bg-image" src="" class="absolute inset-0 w-full h-full object-cover blur-3xl opacity-50 scale-110 z-0 hidden">
+            <video id="modal-bg-video" src="" class="absolute inset-0 w-full h-full object-cover blur-3xl opacity-50 scale-110 z-0 hidden" autoplay loop muted playsinline></video>
+            
+            <!-- Grid overlay for extra texture over the blur -->
+            <div class="absolute inset-0 opacity-20 z-0" style="background-image: radial-gradient(#3f3f46 1px, transparent 1px); background-size: 20px 20px;"></div>
+            
+            <!-- Crisp Foreground Media -->
+            <img id="modal-image" src="" alt="Project Viewer" class="relative z-10 max-w-[90%] max-h-[90%] object-contain rounded-xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+            <video id="modal-video" src="" class="relative z-10 max-w-[90%] max-h-[90%] object-contain rounded-xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] hidden" autoplay loop muted playsinline controls></video>
+        </div>
+    </div>
+
+    <!-- MAIN SCRIPT -->
+    <script>
+        /* -------------------------------------------------------------------------- */
+        /* Device Detection & Cursor Logic                                            */
+        /* -------------------------------------------------------------------------- */
+        const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        const cursor = document.getElementById('custom-cursor');
+
+        if (isTouchDevice) {
+            cursor.style.display = 'none';
+            document.body.style.cursor = 'auto'; 
+        } else {
+            document.addEventListener('mousemove', (e) => {
+                cursor.style.left = e.clientX + 'px';
+                cursor.style.top = e.clientY + 'px';
+            });
+            
+            const interactiveElements = document.querySelectorAll('a, button, .interactive');
+            interactiveElements.forEach(el => {
+                el.addEventListener('mouseenter', () => cursor.classList.add('cursor-hover'));
+                el.addEventListener('mouseleave', () => cursor.classList.remove('cursor-hover'));
+            });
+        }
+
+        /* -------------------------------------------------------------------------- */
+        /* Magnetic Elements Logic                                                    */
+        /* -------------------------------------------------------------------------- */
+        const magneticElements = document.querySelectorAll('.magnetic');
+        
+        if (!isTouchDevice) {
+            magneticElements.forEach((el) => {
+                el.addEventListener('mousemove', (e) => {
+                    const position = el.getBoundingClientRect();
+                    const x = e.clientX - position.left - position.width / 2;
+                    const y = e.clientY - position.top - position.height / 2;
+                    el.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
+                });
+                
+                el.addEventListener('mouseleave', () => {
+                    el.style.transform = 'translate(0px, 0px)';
+                    el.style.transition = 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                });
+                
+                el.addEventListener('mouseenter', () => {
+                    el.style.transition = 'none'; 
+                });
+            });
+        }
+
+        /* -------------------------------------------------------------------------- */
+        /* Scroll Reveal Animation                                                    */
+        /* -------------------------------------------------------------------------- */
+        const observerOptions = { threshold: 0.1, rootMargin: "0px 0px -50px 0px" };
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal-up').forEach(el => revealObserver.observe(el));
+
+        /* -------------------------------------------------------------------------- */
+        /* Project Data & "No-Card" List Generation                                   */
+        /* -------------------------------------------------------------------------- */
+        
+        const projects = [
+            {
+                title: "Appliance Show",
+                category: "3D Motion",
+                video: "./assets/appliance_show.mp4",
+                description: "A dynamic, vertical 3D motion graphic designed for mobile (9:16), showcasing the form and function of a modern air conditioner.",
+                tags: ["Blender", "Premiere", "After Effects"]
+            },
+            {
+                title: "Product Reveal",
+                category: "3D Motion",
+                video: "./assets/appliance_show_royal.mp4",
+                description: "A cinematic 3D product reveal highlighting a new premium line of air conditioning units.",
+                tags: ["Blender", "Premiere", "After Effects"]
+            },
+            {
+                title: "Health Tech AI",
+                category: "AI Generation",
+                video: "./assets/ai_work.mp4",
+                description: "An entirely AI-generated promotional video visualizing an advanced healthcare device.",
+                tags: ["Omni", "VEO", "Runway"]
+            },
+            {
+                title: "Rapid Motion",
+                category: "3D Motion",
+                video: "./assets/appliance_show_2.mp4",
+                description: "A high-energy 3D motion sequence featuring rapid, engaging camera movements to display the air conditioner in action.",
+                tags: ["Blender", "Premiere", "After Effects"]
+            },
+            {
+                title: "Hackathon 2025",
+                category: "2D Motion",
+                video: "./assets/motion.mp4",
+                description: "A vibrant 2D motion graphics piece created as promotional material for a 2025 hackathon event.",
+                tags: ["Premiere", "After Effects"]
+            },
+            {
+                title: "AC Components",
+                category: "3D Rendering",
+                image: "./assets/product_show.jpg",
+                description: "High-resolution vertical 3D rendering isolating and detailing the internal parts and mechanics of an air conditioner.",
+                tags: ["Blender"]
+            },
+            {
+                title: "Cosmetic Viz 01",
+                category: "3D & AI Viz",
+                image: "./assets/cosmetic02.jpg",
+                description: "High-end cosmetic product visualization combining traditional 3D modeling with AI for incredibly photorealistic results.",
+                tags: ["Blender", "AI"]
+            },
+            {
+                title: "Cosmetic Viz 02",
+                category: "3D & AI Viz",
+                image: "./assets/cosmetic.jpg",
+                description: "Photorealistic beauty product rendering blending 3D techniques with generative AI enhancements.",
+                tags: ["Blender", "AI"]
+            }
+        ];
+
+        const projectListContainer = document.getElementById('project-list');
+        const previewContainer = document.getElementById('preview-container');
+
+        projects.forEach((proj, index) => {
+            const item = document.createElement('div');
+            item.className = 'project-item cursor-pointer block border-b border-zinc-800 py-12 md:py-16 px-4 relative group reveal-up';
+            item.style.transitionDelay = `${index * 100}ms`;
+            
+            const splitTitle = proj.title.split('').map(char => 
+                char === ' ' ? '&nbsp;' : `<span class="hover-letter">${char}</span>`
+            ).join('');
+
+            item.innerHTML = `
+                <div class="flex flex-col justify-between items-start z-10 relative pointer-events-none gap-2 md:gap-4 w-full">
+                    <h2 class="font-display font-black text-5xl md:text-6xl text-zinc-400 uppercase tracking-tighter transition-colors group-hover:text-zinc-200 flex flex-wrap">
+                        ${splitTitle}
+                    </h2>
+                    <span class="font-mono text-sm tracking-widest text-zinc-600 group-hover:text-yellow-400 transition-colors text-left mt-2">
+                        ${proj.category}
+                    </span>
+                </div>
+                
+                ${proj.video ? 
+                    `<div class="relative w-full h-64 mt-8 rounded-xl md:hidden pointer-events-none shadow-lg border border-white/10 overflow-hidden">
+                        <video src="${proj.video}" class="absolute inset-0 w-full h-full object-cover blur-xl opacity-60 scale-110" autoplay loop muted playsinline></video>
+                        <video src="${proj.video}" class="absolute inset-0 w-full h-full object-contain z-10" autoplay loop muted playsinline></video>
+                     </div>` 
+                    : 
+                    `<div class="relative w-full h-64 mt-8 rounded-xl md:hidden pointer-events-none shadow-lg border border-white/10 overflow-hidden">
+                        <img src="${proj.image}" class="absolute inset-0 w-full h-full object-cover blur-xl opacity-60 scale-110">
+                        <img src="${proj.image}" class="absolute inset-0 w-full h-full object-contain z-10">
+                     </div>`
+                }
+            `;
+            
+            // Build the dual-layer preview wrapper for Desktop
+            const previewWrapper = document.createElement('div');
+            previewWrapper.className = `preview-wrapper ${index === 0 ? 'active' : ''}`;
+            previewWrapper.id = `preview-wrapper-${index}`;
+            
+            if (proj.video) {
+                previewWrapper.innerHTML = `
+                    <video src="${proj.video}" class="absolute inset-0 w-full h-full object-cover blur-3xl opacity-50 scale-110 z-0" autoplay loop muted playsinline></video>
+                    <video src="${proj.video}" class="absolute inset-0 w-full h-full object-contain z-10 drop-shadow-[0_10px_30px_rgba(0,0,0,0.8)] p-4" autoplay loop muted playsinline></video>
+                `;
+            } else {
+                previewWrapper.innerHTML = `
+                    <img src="${proj.image}" class="absolute inset-0 w-full h-full object-cover blur-3xl opacity-50 scale-110 z-0">
+                    <img src="${proj.image}" class="absolute inset-0 w-full h-full object-contain z-10 drop-shadow-[0_10px_30px_rgba(0,0,0,0.8)] p-4">
+                `;
+            }
+            previewContainer.appendChild(previewWrapper);
+
+            // Hover Logic (Desktop Only)
+            if (!isTouchDevice) {
+                item.addEventListener('mouseenter', () => {
+                    document.querySelectorAll('.preview-wrapper').forEach(media => media.classList.remove('active'));
+                    document.getElementById(`preview-wrapper-${index}`).classList.add('active');
+                });
+            }
+
+            // Click Logic (Opens Modal)
+            item.addEventListener('click', () => openModal(index));
+            
+            projectListContainer.appendChild(item);
+            revealObserver.observe(item);
+        });
+
+        // Track Mouse & Apply Proximity Letter Reactions
+        document.addEventListener('mousemove', (e) => {
+            if (!isTouchDevice) {
+                const letters = document.querySelectorAll('.hover-letter');
+                letters.forEach(letter => {
+                    const rect = letter.getBoundingClientRect();
+                    const letterCenterX = rect.left + rect.width / 2;
+                    const letterCenterY = rect.top + rect.height / 2;
+                    
+                    const dx = e.clientX - letterCenterX; 
+                    const dy = e.clientY - letterCenterY;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    const interactionRadius = 200; 
+                    
+                    if (distance < interactionRadius) {
+                        const intensity = (interactionRadius - distance) / interactionRadius;
+                        
+                        const scale = 1 + (0.35 * intensity); 
+                        const yOffset = -(12 * intensity); 
+                        
+                        letter.style.transform = `translateY(${yOffset}px) scale(${scale})`;
+                        letter.style.color = 'transparent'; 
+                        letter.style.webkitTextStroke = `${1 + (1.5 * intensity)}px #facc15`; 
+                        letter.style.zIndex = '10';
+                    } else {
+                        letter.style.transform = 'translateY(0) scale(1)';
+                        letter.style.color = '';
+                        letter.style.webkitTextStroke = '1px transparent';
+                        letter.style.zIndex = '1';
+                    }
+                });
+            }
+        });
+
+        /* -------------------------------------------------------------------------- */
+        /* Modal Logic (Contrast Flip & Background Blur)                              */
+        /* -------------------------------------------------------------------------- */
+        const modal = document.getElementById('project-modal');
+        
+        function openModal(index) {
+            const proj = projects[index];
+            if(!proj) return;
+
+            document.getElementById('modal-title').innerText = proj.title;
+            document.getElementById('modal-category').innerText = proj.category;
+            document.getElementById('modal-desc').innerText = proj.description;
+            
+            // Foreground elements
+            const modalImg = document.getElementById('modal-image');
+            const modalVid = document.getElementById('modal-video');
+            
+            // Background blur elements
+            const bgImg = document.getElementById('modal-bg-image');
+            const bgVid = document.getElementById('modal-bg-video');
+
+            if (proj.video) {
+                // Setup Video Foreground & Background
+                modalImg.style.display = 'none';
+                bgImg.classList.add('hidden');
+                
+                modalVid.src = proj.video;
+                modalVid.style.display = 'block';
+                
+                bgVid.src = proj.video;
+                bgVid.classList.remove('hidden');
+            } else {
+                // Setup Image Foreground & Background
+                modalVid.style.display = 'none';
+                modalVid.pause();
+                bgVid.classList.add('hidden');
+                bgVid.pause();
+                
+                modalImg.src = proj.image;
+                modalImg.style.display = 'block';
+                
+                bgImg.src = proj.image;
+                bgImg.classList.remove('hidden');
+            }
+            
+            const tagsContainer = document.getElementById('modal-tags');
+            tagsContainer.innerHTML = '';
+            proj.tags.forEach(tag => {
+                tagsContainer.innerHTML += `<span class="px-4 py-2 border border-zinc-900 text-zinc-900 font-mono text-xs font-bold tracking-widest uppercase">${tag}</span>`;
+            });
+
+            modal.classList.remove('modal-closed');
+            modal.classList.add('modal-open');
+            document.body.style.overflow = 'hidden'; 
+        }
+
+        document.getElementById('close-modal').addEventListener('click', () => {
+            modal.classList.remove('modal-open');
+            modal.classList.add('modal-closed');
+            document.body.style.overflow = ''; 
+            document.getElementById('modal-video').pause();
+            document.getElementById('modal-bg-video').pause();
+        });
+
+        /* -------------------------------------------------------------------------- */
+        /* Copy Email Logic                                                           */
+        /* -------------------------------------------------------------------------- */
+        function copyEmail() {
+            navigator.clipboard.writeText("hossein.fth11@gmail.com");
+            const textSpan = document.getElementById('email-btn-text');
+            const originalText = textSpan.innerText;
+            textSpan.innerText = "COPIED TO CLIPBOARD!";
+            
+            setTimeout(() => {
+                textSpan.innerText = originalText;
+            }, 2000);
+        }
+
+        /* -------------------------------------------------------------------------- */
+        /* Interactive Hero Canvas (Tech Constellation)                               */
+        /* -------------------------------------------------------------------------- */
+        const canvas = document.getElementById('hero-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        let width, height;
+        let particles = [];
+        const particleCount = 80;
+        const connectionDistance = 150;
+        const mouseRepelRadius = 200;
+
+        let mouse = { x: null, y: null };
+        
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+        });
+        window.addEventListener('mouseout', () => {
+            mouse.x = null;
+            mouse.y = null;
+        });
+
+        function resizeCanvas() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class CanvasParticle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * 0.5;
+                this.vy = (Math.random() - 0.5) * 0.5;
+                this.radius = Math.random() * 2 + 1;
+                this.baseColor = '#3f3f46';
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+
+                if (this.x < 0 || this.x > width) this.vx *= -1;
+                if (this.y < 0 || this.y > height) this.vy *= -1;
+
+                let isHovered = false;
+                if (mouse.x !== null) {
+                    const dx = mouse.x - this.x;
+                    const dy = mouse.y - this.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < mouseRepelRadius) {
+                        isHovered = true;
+                        const forceDirectionX = dx / distance;
+                        const forceDirectionY = dy / distance;
+                        const force = (mouseRepelRadius - distance) / mouseRepelRadius;
+                        
+                        this.x -= forceDirectionX * force * 2;
+                        this.y -= forceDirectionY * force * 2;
+                    }
+                }
+                return isHovered;
+            }
+
+            draw(isHovered) {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = isHovered ? '#facc15' : this.baseColor; 
+                ctx.fill();
+            }
+        }
+
+        function initCanvas() {
+            particles = [];
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new CanvasParticle());
+            }
+        }
+
+        function animateCanvas() {
+            ctx.clearRect(0, 0, width, height);
+
+            for (let i = 0; i < particles.length; i++) {
+                const isHovered = particles[i].update();
+                particles[i].draw(isHovered);
+
+                for (let j = i; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < connectionDistance) {
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        
+                        const opacity = 1 - (distance / connectionDistance);
+                        
+                        let isNearMouse = false;
+                        if(mouse.x !== null) {
+                            const d1 = Math.sqrt(Math.pow(mouse.x - particles[i].x, 2) + Math.pow(mouse.y - particles[i].y, 2));
+                            const d2 = Math.sqrt(Math.pow(mouse.x - particles[j].x, 2) + Math.pow(mouse.y - particles[j].y, 2));
+                            if(d1 < mouseRepelRadius || d2 < mouseRepelRadius) isNearMouse = true;
+                        }
+
+                        ctx.strokeStyle = isNearMouse ? `rgba(250, 204, 21, ${opacity * 0.5})` : `rgba(63, 63, 70, ${opacity * 0.2})`;
+                        ctx.lineWidth = 1;
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(animateCanvas);
+        }
+
+        initCanvas();
+        animateCanvas();
+
+    </script>
+</body>
+</html>
